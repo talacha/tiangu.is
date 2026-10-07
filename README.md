@@ -15,7 +15,7 @@ A *tianguis* is the open-air market that has run across Mesoamerica since before
  
 1. **Cooperate, don't compete.** Everyone wins or loses together, and helping the slowest player is the best strategy.
 2. **Language is the currency.** Naming a good in the other stall's language earns trust tokens (*confianza*), which save the team when time runs short.
-3. **Works with no connection.** Solo play against bots and pass-and-play on one device run fully offline. Only online rooms and the Claude explanations need a network.
+3. **Works with no connection.** Solo play against bots and pass-and-play on one device run fully offline. Only online rooms and Axo's explanations need a network.
 4. **Assumes nothing about players.** There's no gender field, no gendered avatars and no gendered copy. Players are a name and an animal glyph, and pronouns are optional free text.
 5. **Honest about language.** Indigenous-language text and audio only ship after a native speaker reviews them, and anything unreviewed is visibly labeled *en revisión*.
 6. **Safe by default.** There's no free-text chat. Players talk through a wheel of preset phrases, translated into all five languages.
@@ -37,9 +37,9 @@ A *tianguis* is the open-air market that has run across Mesoamerica since before
 | Job | Online | Offline |
 |---|---|---|
 | "Consejo" hint and bot decisions | **Jev** `Choice` over the legal actions, with a confidence meter | Greedy planner in a Web Worker |
-| Explaining a hint, telling a good's story, narrating the recap | **Claude** voices Axo, a gender-neutral axolotl vendor, in Spanish or English, quoting only reviewed vocabulary | Pre-written, reviewed note cards bundled in the app |
+| Explaining a hint, telling a good's story, narrating the recap | Open-weight models via **OpenRouter**, with Claude Haiku as the fallback, voice Axo, a gender-neutral axolotl vendor, in Spanish or English, quoting only reviewed vocabulary | Pre-written, reviewed note cards bundled in the app |
  
-Claude never generates Nahuatl, Maya or Quechua text. Every Indigenous term it uses is checked against the approved glossary on the server, and anything else falls back to template text.
+No model generates Nahuatl, Maya or Quechua text. Every Indigenous term Axo uses is checked against the approved glossary on the server, and anything else falls back to template text.
  
 ## Tech stack (planned)
  
@@ -50,7 +50,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full architecture, syst
 - **Offline:** Workbox caching and IndexedDB for saved games.
 - **Translations:** i18next with ICU message format, one catalog per locale (`es`, `en`, `nah`, `yua`, `quz`).
 - **Multiplayer:** Supabase Realtime (free tier) channels, with the host as the source of truth.
-- **Server:** Vercel functions `/api/move` (Jev) and `/api/explain` (Claude), hosted on Vercel Hobby.
+- **Server:** Vercel functions `/api/move` (Jev) and `/api/explain` (OpenRouter), hosted on Vercel Hobby.
 - **Rate limits and metrics:** Upstash Redis (free tier, via the Vercel Marketplace).
 - **Tooling:** pnpm, ESLint, Prettier, Vitest and Playwright.
 ### Planned layout
@@ -83,7 +83,9 @@ Environment variables, all optional for offline play:
 |---|---|
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Online rooms |
 | `JEV_API_KEY` | `/api/move` hints and online bots (server only) |
-| `ANTHROPIC_API_KEY` | `/api/explain` Axo explanations (server only) |
+| `OPENROUTER_API_KEY` | `/api/explain` Axo explanations through OpenRouter (server only) |
+| `EXPLAIN_MODELS` | Comma-separated OpenRouter model slugs overriding the default order (server only) |
+| `EXPLAIN_DAILY_BUDGET_USD` | Daily spend cap for `/api/explain`, default 2 (server only) |
 | `REVIEW_CODE` | Passcode for the reviewer tool |
 | `VITE_HIDE_UNREVIEWED` | Hide languages whose goods aren't fully approved |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Per-room rate limits for `/api/move` and metric counters (server only; set by the Vercel Marketplace integration) |
@@ -98,7 +100,7 @@ API keys never reach the client.
 | **M1** Rules engine and offline play | A full market day solo against bots or pass-and-play, with no network |
 | **M2** Content and review pipeline | Real goods, orders, events and notes in five languages, with native-speaker review |
 | **M3** Online rooms | 2 to 4 devices in one room via a code or QR |
-| **M4** AI layer | Jev hints, Claude's Axo explanations, and graceful offline fallbacks |
+| **M4** AI layer | Jev hints, Axo's explanations via OpenRouter, and graceful offline fallbacks |
 | **M5** Inclusion and accessibility | WCAG 2.2 AA, full screen-reader play, gender-neutral copy lint |
 | **M6** Demo polish and launch | Judge-ready demo, landing page, credits and privacy-safe metrics |
  
