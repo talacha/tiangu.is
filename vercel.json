@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'No app yet: nothing to install'",
+  "buildCommand": "mkdir -p dist && cp README.md north-star.md roadmap.md tasks.md dist/ && cp -r docs dist/ && printf '<!doctype html><meta charset=utf-8><title>Tianguis</title><h1>Tianguis</h1><p>Planning docs only; the app lands with TG-001.</p><ul><li><a href=README.md>README</a><li><a href=north-star.md>North star</a><li><a href=roadmap.md>Roadmap</a><li><a href=tasks.md>Tasks</a><li><a href=docs/ARCHITECTURE.md>Architecture</a></ul>' > dist/index.html",
+  "outputDirectory": "dist"
+}
