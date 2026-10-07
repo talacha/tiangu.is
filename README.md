@@ -43,12 +43,15 @@ Claude never generates Nahuatl, Maya or Quechua text. Every Indigenous term it u
  
 ## Tech stack (planned)
  
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full architecture, system diagram and service list.
+
 - **App:** Vite + React + TypeScript (`strict`), shipped as an installable PWA.
 - **Rules engine:** pure TypeScript with no dependencies, written as a seeded, replayable reducer.
 - **Offline:** Workbox caching and IndexedDB for saved games.
 - **Translations:** i18next with ICU message format, one catalog per locale (`es`, `en`, `nah`, `yua`, `quz`).
 - **Multiplayer:** Supabase Realtime (free tier) channels, with the host as the source of truth.
 - **Server:** Vercel functions `/api/move` (Jev) and `/api/explain` (Claude), hosted on Vercel Hobby.
+- **Rate limits and metrics:** Upstash Redis (free tier, via the Vercel Marketplace).
 - **Tooling:** pnpm, ESLint, Prettier, Vitest and Playwright.
 ### Planned layout
  
@@ -83,6 +86,7 @@ Environment variables, all optional for offline play:
 | `ANTHROPIC_API_KEY` | `/api/explain` Axo explanations (server only) |
 | `REVIEW_CODE` | Passcode for the reviewer tool |
 | `VITE_HIDE_UNREVIEWED` | Hide languages whose goods aren't fully approved |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Per-room rate limits for `/api/move` and metric counters (server only; set by the Vercel Marketplace integration) |
  
 API keys never reach the client.
  
