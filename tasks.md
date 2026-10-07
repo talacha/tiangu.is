@@ -314,23 +314,22 @@ Each task is sized so one Claude Code session can complete it in one PR. Every t
   - Add a pause of about 1 s before bot moves so humans can follow, with a "bot pensando…" indicator.
 - **Done when:** a game with mixed online and offline bots finishes cleanly.
 
-### TG-044 `/api/explain` (Claude as Axo)
+### TG-044 `/api/explain` (Axo via OpenRouter)
 - **Depends on:** TG-020, TG-040
 - **Do:**
-  - Create `api/explain.ts` using `@anthropic-ai/sdk`:
-    - model `claude-opus-5-5`, `output_config.effort: "low"`
-    - the server-side refusal fallback: beta `server-side-fallback-2026-07-01` with `fallbacks: "default"`
-    - streaming
-  - **System prompt**, cached with `cache_control`:
+  - Create `api/explain.ts` using the `openai` SDK pointed at OpenRouter, following [AI routing](docs/ARCHITECTURE.md#ai-routing):
+    - open-weight models first (`openai/gpt-oss-120b`, `xiaomi/mimo-v2.6-flash`, `deepseek/deepseek-v4.1-flash`) in one request's `models` list, then `anthropic/claude-haiku-4.5` only when the open-weight answer fails validation
+    - the per-session, per-client and daily caps in Upstash
+  - **System prompt** (the glossary block marked `cache_control` for the Claude fallback):
     - Axo is a friendly axolotl vendor. Never refer to players with gendered words or pronouns.
     - Reply only in `es` or `en`, in 2 to 3 short sentences.
     - Use Indigenous words **only** from the provided glossary, exactly as written. Never invent or translate Indigenous words.
     - Kid-safe tone.
     - The approved glossary for the session's languages is included as a stable block, so the cache hits.
   - **Per-request input:** the compact state, the hinted action and the player's UI language.
-  - Use `client.messages.parse` with `zodOutputFormat({text: string, termsUsed: string[]})`. The server rejects any `termsUsed` term not in the approved glossary and returns the planner's template text instead.
-  - Check `stop_reason` before reading content. On `refusal` or any error, return template text.
-- **Done when:** 20 sampled explanations use no unapproved Indigenous terms, and `usage.cache_read_input_tokens > 0` from the second call on.
+  - Use `response_format` with the JSON schema `{text: string, termsUsed: string[]}` and `provider.require_parameters: true`. The server rejects any `termsUsed` term not in the approved glossary and returns the planner's template text instead.
+  - On a refusal, a timeout or any error, return template text.
+- **Done when:** `pnpm eval:explain` passes the ship rule in the architecture doc for every model in the list, and the session cap returns template text on the 11th call.
 
 ### TG-045 Explanation cache and offline replay
 - **Depends on:** TG-044
