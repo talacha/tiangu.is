@@ -4,7 +4,7 @@
  
 A *tianguis* is the open-air market that has run across Mesoamerica since before the Spanish arrived. In the game, each player runs a stall and the whole group shares one set of community orders, so nobody wins at someone else's expense. Trading is how you play, and naming goods in your partner's language is what makes trades pay off.
  
-> **Status:** planning. This repository has no application code yet. The setup steps below describe the planned toolchain and will be filled in by the first scaffolding task (TG-001).
+> **Status:** planning. The only code so far is a temporary marketing landing page (`src/Landing.tsx`, Vite + React + TypeScript), which TG-001 replaces with the app. Run it with `pnpm install && pnpm dev`. The setup steps below describe the planned toolchain.
  
 ## Who it's for
  
